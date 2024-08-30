@@ -1,0 +1,45 @@
+#define TRIGGER_PIN 9
+#define ECHO_PIN 10
+#define BUZZER_PIN 8
+#define MAX_DISTANCE 200
+#define MIN_DISTANCE 10
+
+void setup() {
+  pinMode(TRIGGER_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  long duration, distance;
+  
+  digitalWrite(TRIGGER_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIGGER_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIGGER_PIN, LOW);
+
+  duration = pulseIn(ECHO_PIN, HIGH);
+  distance = (duration / 2) / 29.1;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if (distance < MIN_DISTANCE) {
+    // Obstacle is very close, continuous beep
+    tone(BUZZER_PIN, 1000); // 1000Hz tone
+  } else if (distance < 30) {
+    // Obstacle is approaching, short beeps
+    tone(BUZZER_PIN, 2000); // 2000Hz tone
+    delay(100); // Delay for 100ms
+    noTone(BUZZER_PIN); // Turn off the buzzer
+    delay(100); // Delay for 100ms
+  } else {
+    // No obstacle, no sound
+    noTone(BUZZER_PIN);
+  }
+  
+  delay(200); // Delay between measurements
+}
